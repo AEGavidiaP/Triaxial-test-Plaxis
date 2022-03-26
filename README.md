@@ -1,2 +1,2 @@
-# Ensayo-Triaxial-Plaxis
-Códigos para crear ensayos triaxiales en PLAXIS y exportar en archivos ".txt"
+# Triaxial-test-Plaxis
+Codes to create ".png" graphics and ".txt" documents of a triaxial test
