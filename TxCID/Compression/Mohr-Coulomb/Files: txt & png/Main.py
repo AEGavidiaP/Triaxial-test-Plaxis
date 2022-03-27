@@ -33,7 +33,7 @@ consolidation = [50, 100, 200] #Confinements
 #Soil properties & assign material
 
 suelo = {"name": "Suelo 1", #Nombre del suelo a evaluar
-         "E": 20000,        #Modulo de elasticidad
+         "E": 11000,        #Modulo de elasticidad
          "nu": 0.3,         #Modulo de Poisson
          "c": 0,            #Cohesion
          "fi": 32,          #angulo de friccion
