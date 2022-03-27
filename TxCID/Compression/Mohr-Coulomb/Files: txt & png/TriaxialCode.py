@@ -230,18 +230,22 @@ def graphics_triaxial(q, Eps1, pE, Evol, e):
     q_data_0, e1_data_0, pE_data_0, eV_data_0, e_data_0 = np.loadtxt('q-e1-pE-eV-e_50.txt', unpack=True)
     q_data_1, e1_data_1, pE_data_1, eV_data_1, e_data_1 = np.loadtxt('q-e1-pE-eV-e_100.txt', unpack=True)
     q_data_2, e1_data_2, pE_data_2, eV_data_2, e_data_2 = np.loadtxt('q-e1-pE-eV-e_200.txt', unpack=True)
+    
+    size_titulo = 9.5
+    size_ejes   = 7
+    size_leyenda = 8
         
     #e1-q
     plt.subplot(221)
-    p1 = plt.plot(Eps1[:,0], q[:,0], "b")
-    p2 = plt.plot(Eps1[:,1], q[:,1], "r")
-    p3 = plt.plot(Eps1[:,2], q[:,2], "m")
-    p4 = plt.plot(e1_data_0,q_data_0, "k")
-    p5 = plt.plot(e1_data_1,q_data_1, "brown")
-    p6 = plt.plot(e1_data_2,q_data_2, "grey")
-    plt.title('Carga-Deformacion')
-    plt.xlabel('$\epsilon_1$')
-    plt.ylabel('q')
+    l1 = plt.plot(Eps1[:,0], q[:,0], "b")
+    l2 = plt.plot(Eps1[:,1], q[:,1], "r")
+    l3 = plt.plot(Eps1[:,2], q[:,2], "m")
+    l4 = plt.plot(e1_data_0,q_data_0, "k")
+    l5 = plt.plot(e1_data_1,q_data_1, "brown")
+    l6 = plt.plot(e1_data_2,q_data_2, "grey")
+    plt.title('Carga-Deformacion', fontsize = size_titulo)
+    plt.xlabel('$\epsilon_1$', fontsize = size_ejes)
+    plt.ylabel('q', fontsize = size_ejes)
     plt.xlim(-0.2,0)
     plt.grid(True)
         
@@ -253,9 +257,9 @@ def graphics_triaxial(q, Eps1, pE, Evol, e):
     plt.plot(pE_data_0,q_data_0, "k")
     plt.plot(pE_data_1,q_data_1, "brown")
     plt.plot(pE_data_2,q_data_2, "grey")
-    plt.title('p\'-q')
-    plt.xlabel('p\'')
-    plt.ylabel('q')
+    plt.title('p\'-q', fontsize = size_titulo)
+    plt.xlabel('p\'', fontsize = size_ejes)
+    plt.ylabel('q', fontsize = size_ejes)
     plt.grid(True)
     
     #e1-ev
@@ -266,9 +270,9 @@ def graphics_triaxial(q, Eps1, pE, Evol, e):
     plt.plot(e1_data_0,eV_data_0, "k")
     plt.plot(e1_data_1,eV_data_1, "brown")
     plt.plot(e1_data_2,eV_data_2, "grey")
-    plt.title('Deformacion axial-volumetrica')
-    plt.xlabel('$\epsilon_1$')
-    plt.ylabel('$\epsilon_V$')
+    plt.title('Deformacion axial-volumetrica', fontsize = size_titulo)
+    plt.xlabel('$\epsilon_1$', fontsize = size_ejes)
+    plt.ylabel('$\epsilon_V$', fontsize = size_ejes)
     plt.xlim(-0.2,0)
     plt.grid(True)
     
@@ -280,15 +284,15 @@ def graphics_triaxial(q, Eps1, pE, Evol, e):
     plt.plot(pE_data_0,e_data_0, "k")
     plt.plot(pE_data_1,e_data_1, "brown")
     plt.plot(pE_data_2,e_data_2, "grey")
-    plt.title('p\'-e')
-    plt.xlabel('p\'')
-    plt.ylabel('e')
+    plt.title('p\'-e', fontsize = size_titulo)
+    plt.xlabel('p\'', fontsize = size_ejes)
+    plt.ylabel('e', fontsize = size_ejes)
     plt.grid(True)
     
     #Legend
-    #plt.legend([p1, p2, p3, p4, p5, p6], labels=leyenda, loc="lower right")
+    plt.legend([l1, l2, l3, l4, l5, l6], labels=leyenda, bbox_to_anchor=(1.05, 0), loc=3, borderaxespad=0, fontsize = size_leyenda)
     
-    #Guardar grafico
-    plt.subplots_adjust(top=0.92, bottom=0.1, left=0.13, right=0.95, hspace=0.4, wspace=0.45)
-    
+    #Save graph
+    plt.subplots_adjust(top=0.94, bottom=0.1, left=0.13, right=0.77, hspace=0.43, wspace=0.33)
+
     plt.savefig("Triaxial Test-Plaxis" +".png")
