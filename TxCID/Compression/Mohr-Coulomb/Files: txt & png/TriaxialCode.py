@@ -188,7 +188,7 @@ def phase_construction(g_i, g_o, punto, suelo, consolidation):
                 pE_o.append(g_o.getcurveresults(punto, step, g_o.ResultTypes.Soil.MeanEffStress))
                 Evol_o.append(g_o.getcurveresults(punto, step, g_o.ResultTypes.Soil.TotalVolumetricStrain))
         
-        filas = round(len(q_o)*1.1,0)
+        filas = round(len(q_o)*1.5,0)
         filas = int(filas)
         
         if i==0:
