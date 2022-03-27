@@ -41,7 +41,7 @@ suelo = {"name": "Suelo 1", #Nombre del suelo a evaluar
          "fi": 35,          #angulo de friccion
          "dilatancia": 0,   #angulo de dilatancia
          "Rf":0.9,          #Relacion de falla qf/qa
-         "K0_nc":0.4236,    #Coefficient of lateral earth pressure for a normally consolidated stress state. Default values ->0.4236 
+         "K0_nc":0.4236,    #Coefficient of lateral earth pressure for a NC stress state. Default values min;max ->(0.4;0.75) 
          "e_o":0.95          #Indice de vacios inicial
         }
 
