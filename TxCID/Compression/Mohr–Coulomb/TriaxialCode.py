@@ -55,7 +55,7 @@ def make_geometry(g_i, width, relacion, str_ax):
     g_i.linedispl(line_h, "Displacement_x", "Free", "Displacement_y", "Fixed")
     
     line_strain_h = g_i.line((0, high), (ancho, high))[-1]
-    g_i.linedispl(line_strain_h, "uy_start", -high*str_ax)
+    g_i.linedispl(line_strain_h, "uy_start", -high*(str_ax+.01))
     
     line_load_v = g_i.line((0, high), (ancho, high))[-1] 
     g_i.lineload(line_load_v, "qy_start", -1, "qx_start", 0)
