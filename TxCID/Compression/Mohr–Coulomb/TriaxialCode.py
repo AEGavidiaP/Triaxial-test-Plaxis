@@ -160,7 +160,7 @@ def phase_construction(g_i, g_o, punto, suelo, consolidation):
         shear_phase.Deform.IgnoreUndrainedBehaviour = True
         shear_phase.Deform.ResetDisplacementsToZero = True
         shear_phase.Deform.UseDefaultIterationParams = False
-        shear_phase.Deform.ToleratedError = 0.001
+        shear_phase.Deform.ToleratedError = 0.00001
         g_i.activate(top_strain, shear_phase)
     
         g_i.calculate()
