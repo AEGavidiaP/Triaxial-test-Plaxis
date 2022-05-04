@@ -73,7 +73,7 @@ def soilmaterial_mc_drain(g_i, suelo):
     drainagetype = 0 #Tipo de drenaje, en el material drenado se utiliza el valor de "0"
     gamma = 0        #Para simular ensayos triaxiales el material se debe creo con un peso unitario igual a c
     
-    soil_params = [("MaterialName", suelo["name"]),
+    soil_params = [("MateriaLName", suelo["name"]),
                   ("SoilModel", soilmodel),
                   ("DrainageType", drainagetype),
                   ("gammaUnsat", gamma),
@@ -110,16 +110,15 @@ def mesh_point(g_i, g_o, medio):
     return punto
     
     
-def phase_construction(g_i, g_o, punto, suelo, consolidation):
-
-    top_load   = g_i.LineLoad_1_1.qy_start
-    top_strain = g_i.LineDisplacement_3_1
-    right_load = g_i.LineLoad_2_1.qx_start
-    eo = suelo["e_o"]   #Void Ratio Initial
-       
+def phase_construction(g_i):
+    
     # set up calculation
     
     g_i.gotostages()
+    
+    top_load   = g_i.LineLoad_1_1.qy_start
+    right_load = g_i.LineLoad_2_1.qx_start
+    top_strain = g_i.LineDisplacement_3_1
     
     # initial phase
     
@@ -132,91 +131,79 @@ def phase_construction(g_i, g_o, punto, suelo, consolidation):
     g_i.deactivate(top_strain, g_i.InitialPhase)
     g_i.deactivate(model_conditions, g_i.InitialPhase)
     
-    i = 0
-    contador = []
-    
-    count_test = len(consolidation)
-    
-    for k in range(0,count_test):
-        k = 2 + k*2
-        
-        conso = consolidation[i]
-           
-        # consolidation phase
-            
-        consolidation_phase = g_i.phase(g_i.InitialPhase)
-        consolidation_phase.DeformCalcType = "Plastic"
-        consolidation_phase.Identification = "Consolidacion [" + str(conso) + "kPa]"
-        consolidation_phase.Deform.IgnoreUndrainedBehaviour = True
-        g_i.activate((g_i.lineloads), consolidation_phase)
-        top_load.set(consolidation_phase, -conso)
-        right_load.set(consolidation_phase, -conso)
-            
-        # shear phase
-            
-        shear_phase = g_i.phase(consolidation_phase)
-        shear_phase.DeformCalcType = "Plastic"
-        shear_phase.Identification = "Corte [Consolidacion " + str(conso) + "kPa]"
-        shear_phase.Deform.IgnoreUndrainedBehaviour = True
-        shear_phase.Deform.ResetDisplacementsToZero = True
-        shear_phase.Deform.UseDefaultIterationParams = False
-        shear_phase.Deform.ToleratedError = 0.00001
-        g_i.activate(top_strain, shear_phase)
-    
-        g_i.calculate()
-        
-        g_i.view(consolidation_phase)
-        Evol_conso   = []
-        Evol_conso.append(g_o.getcurveresults(punto, g_o.Phases[k-1], g_o.ResultTypes.Soil.TotalVolumetricStrain))
-        Evol_consolidation = Evol_conso[0]
-        Evol_consolidationr = float(Evol_consolidation)
-        e_phase =  Evol_consolidation*(1+eo) +  eo
-        
-        q_o = [0]
-        Eps1_o  = [0]
-        pE_o = [-conso]
-        Evol_o = [0]
-        
-        #Fases a considerar
-        phaseorder  = [g_o.Phases[k]]
+    return top_strain, top_load, right_load
 
-        for phase in phaseorder:
-            for step in phase.Steps:
-                q_o.append(g_o.getcurveresults(punto, step, g_o.ResultTypes.Soil.DeviatoricStress))
-                Eps1_o.append(g_o.getcurveresults(punto, step, g_o.ResultTypes.Soil.Eps1))
-                pE_o.append(g_o.getcurveresults(punto, step, g_o.ResultTypes.Soil.MeanEffStress))
-                Evol_o.append(g_o.getcurveresults(punto, step, g_o.ResultTypes.Soil.TotalVolumetricStrain))
-        
-        filas = round(len(q_o)*10,0)
-        filas = int(filas)
-        
-        if i==0:
-            q_total    = np.zeros([filas, count_test])
-            Eps1_total = np.zeros([filas, count_test])
-            pE_total   = np.zeros([filas, count_test])
-            Evol_total = np.zeros([filas, count_test])
-            e_total    = np.zeros([filas, count_test])
-        
-        valor = len(q_total[:,0]) - len(q_o)
-        for j in range(valor):
-            q_o.append(q_o[-1])
-            Eps1_o.append(Eps1_o[-1])
-            pE_o.append(pE_o[-1])
-            Evol_o.append(Evol_o[-1])
-            j += 1
+def conso_shear(g_i, g_o, punto, suelo, consolidation, k, i, top_strain, top_load, right_load):
     
-        q_total[:,i]    = q_o
-        Eps1_total[:,i] = Eps1_o
-        pE_total[:,i]   = pE_o
-        Evol_total[:,i] = Evol_o
-        e_total[:,i]    = Evol_total[:,i]*(1+eo) + e_phase
-        
-        with open("Results\q-e1-pE-eV-e [" + str(conso) + "kPa]-PLAXIS" + ".txt", "w") as file:
-            for j in range(filas):
-                datos = "{:.2f}\t{:.5f}\t{:.2f}\t{:.5f}\t{:.5f}\n".format(q_total[j,i], Eps1_total[j,i], pE_total[j,i], Evol_total[j,i], e_total[j,i])
-                file.writelines(datos)
-                
-        i += 1 
-        g_o.update()
+    eo = suelo["e_o"]   #Void Ratio Initial
+
+    k = 2 + k*2
     
-    return q_total, Eps1_total, pE_total, Evol_total, e_total
+    conso = consolidation[i]
+       
+    # consolidation phase
+        
+    consolidation_phase = g_i.phase(g_i.InitialPhase)
+    consolidation_phase.DeformCalcType = "Plastic"
+    consolidation_phase.Identification = "Consolidacion [" + str(conso) + "kPa]"
+    consolidation_phase.Deform.IgnoreUndrainedBehaviour = True
+    g_i.activate((g_i.lineloads), consolidation_phase)
+    top_load.set(consolidation_phase, -conso)
+    right_load.set(consolidation_phase, -conso)
+        
+    # shear phase
+        
+    shear_phase = g_i.phase(consolidation_phase)
+    shear_phase.DeformCalcType = "Plastic"
+    shear_phase.Identification = "Corte [Consolidacion " + str(conso) + "kPa]"
+    shear_phase.Deform.IgnoreUndrainedBehaviour = True
+    shear_phase.Deform.ResetDisplacementsToZero = True
+    shear_phase.Deform.UseDefaultIterationParams = False
+    shear_phase.Deform.ToleratedError = 0.0001
+    shear_phase.Deform.MaxLoadFractionPerStep = 0.01
+    g_i.activate(top_strain, shear_phase)
+
+    g_i.calculate()
+    
+    g_i.view(consolidation_phase)
+    Evol_conso   = []
+    Evol_conso.append(g_o.getcurveresults(punto, g_o.Phases[k-1], g_o.ResultTypes.Soil.TotalVolumetricStrain))
+    Evol_consolidation = Evol_conso[0]
+    Evol_consolidation = float(Evol_consolidation)
+    e_phase =  Evol_consolidation*(1+eo) +  eo
+    
+    q_o = [0]
+    Eps1_o  = [0]
+    pE_o = [-conso]
+    Evol_o = [0]
+    
+    #Fases a considerar
+    phaseorder  = [g_o.Phases[k]]
+
+    for phase in phaseorder:
+        for step in phase.Steps:
+            q_o.append(g_o.getcurveresults(punto, step, g_o.ResultTypes.Soil.DeviatoricStress))
+            Eps1_o.append(g_o.getcurveresults(punto, step, g_o.ResultTypes.Soil.Eps1))
+            pE_o.append(g_o.getcurveresults(punto, step, g_o.ResultTypes.Soil.MeanEffStress))
+            Evol_o.append(g_o.getcurveresults(punto, step, g_o.ResultTypes.Soil.TotalVolumetricStrain))
+    
+    filas = round(len(q_o),0)
+    
+    q_total    = np.zeros([filas, 1])
+    Eps1_total = np.zeros([filas, 1])
+    pE_total   = np.zeros([filas, 1])
+    Evol_total = np.zeros([filas, 1])
+    e_total    = np.zeros([filas, 1])
+
+    q_total[:,0]    = q_o
+    Eps1_total[:,0] = Eps1_o
+    pE_total[:,0]   = pE_o
+    Evol_total[:,0] = Evol_o
+    e_total[:,0]    = Evol_total[:,0]*(1+eo) + e_phase
+    
+    with open("Results\q-e1-pE-eV-e [" + str(conso) + "kPa]-PLAXIS" + ".txt", "w") as file:
+        for j in range(filas):
+            datos = "{:.2f}\t{:.5f}\t{:.2f}\t{:.5f}\t{:.5f}\n".format(q_total[j,0], Eps1_total[j,0], pE_total[j,0], Evol_total[j,0], e_total[j,0])
+            file.writelines(datos)
+
+    g_o.update()

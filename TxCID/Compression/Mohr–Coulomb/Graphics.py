@@ -93,7 +93,7 @@ def Triaxial_2(q, e1, pE, eV, e, q_data, e1_data, pE_data, eV_data, e_data, size
     
     return l5, l6
 
-def graphics_triaxial(q, Eps1, pE, Evol, e, consolidation, str_ax):
+def graphics_triaxial(consolidation, str_ax):
     
     size_titulo = 9.5
     size_ejes   = 7
@@ -109,13 +109,13 @@ def graphics_triaxial(q, Eps1, pE, Evol, e, consolidation, str_ax):
     
     for i in range(0,conso):
         if i == 0:
-            q_0, e1_0, pE_0, eV_0, e_0 = q[:,0], Eps1[:,0], pE[:,0], Evol[:,0], e[:,0]
+            q_0, e1_0, pE_0, eV_0, e_0 = np.loadtxt('Results\q-e1-pE-eV-e [' + str(consolidation[i]) + 'kPa]-PLAXIS' + '.txt', unpack=True)
             l1, l2 = Triaxial_0(q_0, e1_0, pE_0, eV_0, e_0, q_data_0, e1_data_0, pE_data_0, eV_data_0, e_data_0, size_titulo, size_ejes, size_leyenda, str_ax)
         if i == 1:
-            q_1, e1_1, pE_1, eV_1, e_1 = q[:,1], Eps1[:,1], pE[:,1], Evol[:,1], e[:,1]
+            q_1, e1_1, pE_1, eV_1, e_1 = np.loadtxt('Results\q-e1-pE-eV-e [' + str(consolidation[i]) + 'kPa]-PLAXIS' + '.txt', unpack=True)
             l3, l4 = Triaxial_1(q_1, e1_1, pE_1, eV_1, e_1, q_data_1, e1_data_1, pE_data_1, eV_data_1, e_data_1, size_titulo, size_ejes, size_leyenda)    
         if i == 2:
-            q_2, e1_2, pE_2, eV_2, e_2 = q[:,2], Eps1[:,2], pE[:,2], Evol[:,2], e[:,2]
+            q_2, e1_2, pE_2, eV_2, e_2 = np.loadtxt('Results\q-e1-pE-eV-e [' + str(consolidation[i]) + 'kPa]-PLAXIS' + '.txt', unpack=True)
             l5, l6 = Triaxial_2(q_2, e1_2, pE_2, eV_2, e_2, q_data_2, e1_data_2, pE_data_2, eV_data_2, e_data_2, size_titulo, size_ejes, size_leyenda)
         
     if i == 0:

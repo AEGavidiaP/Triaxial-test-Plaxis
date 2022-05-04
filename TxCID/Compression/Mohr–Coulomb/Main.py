@@ -5,7 +5,7 @@ from plxscripting.easy import *
 
 l_input = 10000
 l_ouput = 10001
-pw = 'ixcMy6nxXr5/3iA%' #Cambiar segun usuario de PLAXIS
+pw = 'DMRkVStuL#6$6Q!y' #Cambiar segun usuario de PLAXIS
 
 s_i, g_i = new_server('localhost', l_input, password=pw)
 s_o, g_o = new_server('localhost', l_ouput, password=s_i.connection._password)
@@ -35,11 +35,11 @@ consolidation = [50, 100, 200] #Confinements
 #Soil properties & assign material
 
 suelo = {"name": "Suelo 1", #Nombre del suelo a evaluar
-         "E": 15000,        #Modulo de elasticidad
-         "nu": 0.3,         #Modulo de Poisson
+         "E": 8780,        #Modulo de elasticidad
+         "nu": 0.16,         #Modulo de Poisson
          "c": 0,            #Cohesion
-         "fi": 32,          #angulo de friccion
-         "dilatancia": 0,   #angulo de dilatancia
+         "fi": 35.37,          #angulo de friccion
+         "dilatancia": 0.22,   #angulo de dilatancia
          "e_o":0.76         #Indice de vacios inicial
         }
 
@@ -59,7 +59,14 @@ probeta_ensayo = g_i.setmaterial(ensayo)
 punto = TriaxialCode.mesh_point(g_i, g_o, medio)
 
 #Construction phases for the triaxial test
-q, Eps1, pE, Evol, e = TriaxialCode.phase_construction(g_i, g_o, punto, suelo, consolidation)
+top_strain, top_load, right_load = TriaxialCode.phase_construction(g_i)
+
+i = 0
+contador = []
+count_test = len(consolidation)
+for k in range(0,count_test):
+    TriaxialCode.conso_shear(g_i, g_o, punto, suelo, consolidation, k, i, top_strain, top_load, right_load)
+    i += 1
 
 #Plot triaxial in 4 planes (Save in png)
-Graphics.graphics_triaxial(q, Eps1, pE, Evol, e, consolidation, str_ax)
+Graphics.graphics_triaxial(consolidation, str_ax)
